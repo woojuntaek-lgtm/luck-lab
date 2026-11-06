@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#151a22">
+<title>우연 당첨 연구소</title>
+<meta name="description" content="효과가 없는데 아홉 번째 무리만 유의하다? — 빅데이터 탐색 프로젝트: 주제와 SMART 목표, 가설과 p값, 여러 번 검정하는 함정과 본페로니 보정, 탐색 계획서와 데이터 명세서, AARRR 퍼널, 코호트 분석, 대시보드 설계, 스트림릿 슬라이더와 이상치 기준을 손으로 체험하는 앱">
+<style>
+:root{--bg:#151a22;--card:#1c232e;--card2:#25303d;--fg:#eff3f8;--mut:#a3b0c2;--line:#33425a;
+--a:#7cc4ff;--b:#ff9b5c;--ok:#6fdc9a;--bad:#ff7d7d;--gold:#ffd166;--pur:#b79cff}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;line-height:1.55}
+[hidden]{display:none!important}
+.wrap{max-width:560px;margin:0 auto;padding:12px 14px 40px}
+h1{font-size:1.2rem;margin:6px 0}
+h1 small{display:block;font-size:.76rem;color:var(--mut);font-weight:400}
+.tabs{display:flex;gap:5px;margin:10px 0}
+.tabs button{flex:1;padding:9px 2px;border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:10px;font-size:.82rem;font-weight:600}
+.tabs button.on{background:#24406e;color:#fff;border-color:var(--a)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+h2{font-size:1rem;margin:2px 0 8px}
+.note{font-size:.86rem;color:var(--mut);margin:8px 0 0}
+.note b{color:var(--fg)}
+.btn{padding:11px 14px;border-radius:12px;border:0;background:linear-gradient(135deg,#2f6fd0,#7cc4ff);color:#fff;font-weight:800;font-size:.95rem;flex:1}
+.btn.sec{background:var(--card2);border:1px solid var(--line);color:var(--fg);font-weight:700}
+.btn.sm{flex:none;padding:7px 11px;font-size:.82rem}
+.btn:disabled{opacity:.4}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.row+.row{margin-top:8px}
+.pill{padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:.84rem}
+.pill.on{border-color:var(--gold);background:#4a3e1a;color:#fff}
+.lbl{font-size:.8rem;color:var(--mut)}
+canvas{display:block;width:100%;border-radius:12px;background:#10141b;margin-top:8px;touch-action:none}
+.say{background:#16304c;border-left:3px solid var(--a);border-radius:8px;padding:9px 11px;font-size:.92rem;margin-top:10px}
+.say b{color:#fff}
+.say.q{border-left-color:var(--b);background:#2e2118}
+.res{margin-top:10px;font-size:.92rem;border-radius:10px;padding:10px 12px}
+.res.g{background:#16352a;border:1px solid #2f7a52}
+.res.r{background:#3a1d1d;border:1px solid #8a3a3a}
+.res.y{background:#3a3218;border:1px solid #8a7a3a}
+.code{background:#0f131a;border:1px solid #26324a;border-radius:10px;padding:9px 11px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;line-height:1.65;white-space:pre;overflow-x:auto;margin-top:8px}
+.code .k{color:#ff9bd2}.code .s{color:#a5e38a}.code .c{color:#6b7a90}.code .n{color:#ffd166}.code .f{color:#7cc4ff}
+.out{background:#0b0e13;border-radius:10px;padding:8px 11px;margin-top:8px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem;white-space:pre-wrap;word-break:break-all}
+.out .p{color:#6b7a90}.out .o{color:#6fdc9a}.out .w{color:#ffd166}.out .e{color:#ff7d7d}
+.opts{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.opts button{text-align:left;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:.92rem}
+.opts button.right{border-color:#6fdc9a;background:#16352a}
+.opts button.wrong{border-color:#ff7d7d;background:#3a1d1d}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.stats div{background:var(--card2);border-radius:10px;padding:7px 6px;text-align:center;font-size:.74rem;color:var(--mut)}
+.stats div b{display:block;font-size:1.02rem;color:var(--fg);font-variant-numeric:tabular-nums}
+.sl{display:grid;grid-template-columns:84px 1fr 54px;gap:8px;align-items:center;font-size:.84rem;margin-top:6px}
+.sl b{text-align:right;font-variant-numeric:tabular-nums}
+input[type=range]{width:100%}
+input[type=text]{flex:1;min-width:0;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#10141b;color:var(--fg);font-size:.92rem}
+.sum3{margin-top:12px;background:linear-gradient(135deg,#1d3358,#3a2a5a);border-radius:14px;padding:12px 14px}
+.sum3 ol{margin:4px 0;padding-left:20px;font-size:.92rem}
+.mine{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.mine div{display:flex;justify-content:space-between;gap:8px;background:var(--card2);border-radius:10px;padding:8px 10px;font-size:.88rem}
+.mine button{border:0;background:none;color:var(--mut);font-size:.9rem}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000c;color:#fff;padding:10px 16px;border-radius:999px;font-size:.9rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+footer{text-align:center;color:var(--mut);font-size:.78rem;margin-top:18px}
+footer a{color:var(--mut)}
+.tw{overflow-x:auto;margin-top:8px;border-radius:10px;border:1px solid #26324a}
+table.df{border-collapse:collapse;width:100%;font-size:.82rem;font-variant-numeric:tabular-nums;background:#0f131a}
+table.df th,table.df td{padding:6px 8px;text-align:center;border-bottom:1px solid #222b38}
+table.df thead th{background:#1a2230;color:#a3b0c2}
+.ax{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.ax button{padding:6px 9px;border-radius:8px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:.8rem}
+.mat{display:inline-grid;gap:2px 10px;padding:4px 8px;border-left:2px solid #6b7a90;border-right:2px solid #6b7a90;border-radius:4px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem;text-align:right;vertical-align:middle}
+.mrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;font-size:.9rem}
+.rt{border-collapse:collapse;margin:8px auto 0;font-variant-numeric:tabular-nums}
+.rt th,.rt td{width:46px;height:38px;text-align:center;border:1px solid #26324a;font-size:.88rem}
+.rt th{background:#1a2230;color:#a3b0c2;font-size:.74rem;font-weight:600}
+.rt td.b{color:#5a6b85}
+.rt td.f{color:#ffd166;font-weight:800;background:#3a3218}
+.flow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.flow button{flex:1 1 30%;padding:9px 4px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--fg);font-size:.8rem}
+.flow button.on{border-color:var(--gold);background:#4a3e1a}
+.rep{background:#fff;color:#222;border-radius:10px;padding:12px;margin-top:8px;font-size:.82rem}
+.rep h3{margin:0 0 6px;font-size:1rem}
+.rep table{border-collapse:collapse;font-size:.78rem}
+.rep td,.rep th{border:1px solid #ccc;padding:3px 6px}
+.rep img{max-width:100%;display:block;margin-top:6px}
+.dash{background:#0f131a;border:1px solid #26324a;border-radius:10px;padding:10px;margin-top:8px}
+.kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kpi div{background:#1a2230;border-radius:8px;padding:8px;text-align:center;font-size:.72rem;color:#a3b0c2}
+.kpi b{display:block;font-size:1.15rem;color:#eff3f8}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🎰 우연 당첨 연구소<small>효과가 없는데 아홉 번째 무리만 유의하다? — 탐색 프로젝트</small></h1>
+<div class="tabs">
+  <button class="on" data-tab="t1">① 스무 번</button>
+  <button data-tab="t2">② 가설·p값</button>
+  <button data-tab="t3">③ 퍼널·코호트</button>
+  <button data-tab="t4">④ 대시보드</button>
+</div>
+
+<!-- ① -->
+<section id="tab-t1">
+  <div class="card">
+    <h2>🎟️ 첫 장면: 쿠폰 효과, 무리 20개 검정</h2>
+    <p class="note" style="margin-top:0">무리마다 쿠폰 50명 vs 없음 50명의 평균 구매액을 t검정. 막대 = p값 (낮을수록 위로). 막대를 눌러 보세요.</p>
+    <div class="row" style="margin-top:8px"><button class="pill on" data-bf="0">기준 0.05</button><button class="pill" data-bf="1">본페로니 0.05 / 20</button></div>
+    <canvas id="hkCv"></canvas>
+    <div class="out" id="hkOut"></div>
+    <div id="hkMsg"></div>
+  </div>
+
+  <div class="card">
+    <h2>❓ 퀴즈 ① 효과가 전혀 없는데 독립 검정 20번(각 0.05 기준). 적어도 한 번 "유의"가 나올 확률은?</h2>
+    <div class="opts" id="q1">
+      <button data-a="a">약 5%</button>
+      <button data-a="b">약 64%</button>
+      <button data-a="c">100%</button>
+    </div>
+    <div id="q1Msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>🎲 직접 모의실험: 효과 0인 데이터로 20번씩</h2>
+    <p class="note" style="margin-top:0">버튼 한 번에 "무리 20개 검정"을 200세트 새로 만듭니다 (브라우저에서 t검정 직접 계산).</p>
+    <div class="row"><button class="btn" id="smRun">200세트 더 ▶</button><button class="btn sec sm" id="smClr">처음부터</button></div>
+    <canvas id="smCv"></canvas>
+    <div class="stats"><div>실험한 세트<b id="smN">0</b></div><div>하나라도 걸린 비율<b id="smP">-</b></div><div>이론값 1 − 0.95²⁰<b>64.2%</b></div></div>
+  </div>
+
+  <div class="card">
+    <h2>📈 검정 횟수가 늘면</h2>
+    <div class="sl"><span>검정 횟수 m</span><input type="range" id="mtM" min="1" max="60" value="20"><b id="mtMv">20</b></div>
+    <canvas id="mtCv"></canvas>
+    <div class="out" id="mtOut"></div>
+  </div>
+</section>
+
+<!-- ② -->
+<section id="tab-t2" hidden>
+  <div class="card">
+    <h2>🎯 주제와 SMART 목표</h2>
+    <p class="note" style="margin-top:0">좋은 주제 = <b>결정에 쓰일 가치</b> + <b>답할 데이터</b>. 하향식(회사 목표에서)과 상향식(데이터 패턴에서)을 오가며 다듬습니다. 목표 문장을 눌러 점검해 보세요.</p>
+    <div class="row"><button class="pill on" data-sm="bad">"매출을 올린다"</button><button class="pill" data-sm="good">"다음 분기까지 재구매율 20% → 25%"</button></div>
+    <div class="tw"><table class="df" id="smTb"></table></div>
+  </div>
+
+  <div class="card">
+    <h2>🧪 가설: 확인할 수 있게</h2>
+    <div class="row"><button class="pill on" data-hy="0">쿠폰이 좋다</button><button class="pill" data-hy="1">쿠폰 받은 고객의 평균 구매액이 더 높다</button></div>
+    <div id="hyBox"></div>
+  </div>
+
+  <div class="card">
+    <h2>📐 p값이 뜻하는 것</h2>
+    <p class="note" style="margin-top:0">귀무가설(차이 없음)이 맞다면 t값은 이 종 모양을 따릅니다. 무리를 골라 지금의 t값이 어디쯤인지 보세요. 빨간 꼬리 넓이 = p값.</p>
+    <div class="sl"><span>무리 번호</span><input type="range" id="pvG" min="1" max="20" value="9"><b id="pvGv">9</b></div>
+    <canvas id="pvCv"></canvas>
+    <div class="out" id="pvOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>🚫 흔한 오해 세 가지</h2>
+    <div class="opts" id="mis"></div>
+    <div id="misMsg"></div>
+  </div>
+</section>
+
+<!-- ③ -->
+<section id="tab-t3" hidden>
+  <div class="card">
+    <h2>📋 탐색 계획서와 데이터 명세서</h2>
+    <p class="note" style="margin-top:0">분석 <b>전에</b> 적어 둡니다 — 결과를 보고 나서 질문을 바꾸는 일을 막는 장치.</p>
+    <div class="tw"><table class="df" id="spTb"></table></div>
+    <div class="say q">계획서에 적을 것: 변수 정의(명세서) · 요약 통계 · 관계 탐색 방법 · <b>검정할 가설과 횟수</b> · 보여 줄 차트. 쪼개다 걸린 결과는 <b>새 가설</b>로 삼고 다른 데이터로 다시 확인.</div>
+  </div>
+
+  <div class="card">
+    <h2>🏴‍☠️ AARRR 퍼널: 단계마다 남은 사람에게 곱하기</h2>
+    <div class="sl"><span>방문자</span><input type="range" id="fnV" min="1000" max="50000" step="1000" value="10000"><b id="fnVv">10000</b></div>
+    <div class="sl"><span>가입 %</span><input type="range" id="fnA" min="5" max="90" value="40"><b id="fnAv">40</b></div>
+    <div class="sl"><span>첫 구매 %</span><input type="range" id="fnB" min="5" max="90" value="25"><b id="fnBv">25</b></div>
+    <div class="sl"><span>재구매 %</span><input type="range" id="fnC" min="5" max="90" value="50"><b id="fnCv2">50</b></div>
+    <canvas id="fnCv"></canvas>
+    <div class="out" id="fnOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>❓ 퀴즈 ② 방문자 10,000명 → 가입 40% → 첫 구매 25% → 재구매 50%. 재구매 고객은?</h2>
+    <div class="opts" id="q2">
+      <button data-a="a">500명</button>
+      <button data-a="b">1,000명</button>
+      <button data-a="c">2,500명</button>
+    </div>
+    <div id="q2Msg"></div>
+  </div>
+
+  <div class="card">
+    <h2>🧊 코호트: 같은 달에 온 사람끼리</h2>
+    <p class="note" style="margin-top:0">행 = 가입한 달, 열 = 경과한 달, 칸 = 남은 비율(원고의 설명용 예시 값).</p>
+    <div class="row"><button class="pill on" data-ch="heat">코호트 히트맵</button><button class="pill" data-ch="avg">전체 평균만 보면</button></div>
+    <canvas id="chCv"></canvas>
+    <div id="chMsg"></div>
+    <div class="code">cohort = df.<span class="f">pivot_table</span>(index=<span class="s">'가입월'</span>, columns=<span class="s">'경과월'</span>,
+                        values=<span class="s">'고객번호'</span>, aggfunc=<span class="s">'nunique'</span>)
+retention = cohort.<span class="f">div</span>(cohort[<span class="n">0</span>], axis=<span class="n">0</span>) * <span class="n">100</span>     <span class="c"># 첫 달 대비 남은 비율</span>
+sns.<span class="f">heatmap</span>(retention, annot=<span class="k">True</span>, fmt=<span class="s">'.0f'</span>, cmap=<span class="s">'Blues'</span>)</div>
+  </div>
+</section>
+
+<!-- ④ -->
+<section id="tab-t4" hidden>
+  <div class="card">
+    <h2>👥 누구를 위한 대시보드인가</h2>
+    <div class="row"><button class="pill on" data-db="exec">전략형 (경영진)</button><button class="pill" data-db="ana">분석형 (분석가)</button><button class="pill" data-db="ops">운영형 (실무자)</button></div>
+    <div id="dbBox"></div>
+  </div>
+
+  <div class="card">
+    <h2>🎚️ 슬라이더 하나가 바꾸는 것: 이상치 기준</h2>
+    <p class="note" style="margin-top:0">오른쪽 꼬리가 긴 소득 모양 예시 데이터 1,000개 (원고 메모의 방식으로 만든 모의 값). IQR에 곱하는 배수 k를 바꿔 보세요.</p>
+    <div class="sl"><span>배수 k</span><input type="range" id="iqK" min="1" max="3.5" step="0.1" value="1.5"><b id="iqKv">1.5</b></div>
+    <div class="dash"><div class="kpi"><div>기준 k<b id="iqA">1.5</b></div><div>이상치<b id="iqB">-</b></div><div>위쪽 경계<b id="iqC">-</b></div></div><canvas id="iqCv"></canvas></div>
+    <div class="out" id="iqOut"></div>
+  </div>
+
+  <div class="card">
+    <h2>🐍 스트림릿으로 만드는 대시보드</h2>
+    <div class="code"><span class="c"># app.py  →  터미널에서: streamlit run app.py</span>
+<span class="k">import</span> streamlit <span class="k">as</span> st, plotly.express <span class="k">as</span> px, numpy <span class="k">as</span> np
+
+x = np.random.<span class="f">default_rng</span>(<span class="n">3</span>).<span class="f">lognormal</span>(<span class="n">10</span>, <span class="n">0.6</span>, <span class="n">1000</span>)
+k = st.sidebar.<span class="f">slider</span>(<span class="s">'IQR 배수'</span>, <span class="n">1.0</span>, <span class="n">3.5</span>, <span class="n">1.5</span>, <span class="n">0.1</span>)  <span class="c"># 최솟값, 최댓값, 기본값, 간격</span>
+q1, q3 = np.<span class="f">percentile</span>(x, [<span class="n">25</span>, <span class="n">75</span>]); iqr = q3 - q1
+out = (x &lt; q1 - k*iqr) | (x &gt; q3 + k*iqr)
+
+c1, c2 = st.<span class="f">columns</span>(<span class="n">2</span>)
+c1.<span class="f">metric</span>(<span class="s">'기준 배수'</span>, k)                       <span class="c"># 큰 카드 숫자</span>
+c2.<span class="f">metric</span>(<span class="s">'이상치 개수'</span>, <span class="f">int</span>(out.<span class="f">sum</span>()))
+st.<span class="f">plotly_chart</span>(px.<span class="f">histogram</span>(x[~out], nbins=<span class="n">40</span>))   <span class="c"># 확대·마우스 올리기</span>
+<span class="c"># 슬라이더를 움직일 때마다 스크립트 전체가 다시 실행됨</span></div>
+  </div>
+
+  <div class="card">
+    <h2>📌 세 줄 정리</h2>
+    <div class="sum3"><ol>
+      <li>주제는 <b>가치와 데이터 가용성</b>으로 고르고, 목표는 <b>SMART</b>하게, 가설은 <b>확인할 수 있게</b> 쓴다.</li>
+      <li>p값은 <b>우연의 확률</b>이고, 스무 번 검정하면 하나쯤은 우연히 걸리니 <b>계획을 먼저 적고 보정</b>한다.</li>
+      <li>퍼널은 <b>단계별 비율을 곱하고</b>, 코호트는 <b>같은 출발점끼리</b> 비교하며, 대시보드는 <b>보는 사람과 기준</b>을 함께 보여 준다.</li>
+    </ol></div>
+  </div>
+
+  <div class="card">
+    <h2>🤔 생각해 볼 질문</h2>
+    <p class="note" style="margin-top:0">최근에 본 놀라운 분석 결과 가운데, <b>몇 번을 쪼개고 비교한 끝에</b> 나온 것은? 새 데이터로 다시 확인하면? (이 기기에만 저장)</p>
+    <div class="row" style="margin-top:8px"><input type="text" id="myIn" maxlength="70" placeholder="예: 화요일에만 효과 있던 광고 → 다음 달 데이터로 재확인"><button class="btn sm" id="myAdd">추가</button></div>
+    <div class="mine" id="mine"></div>
+  </div>
+</section>
+
+<footer>© 2026 정필 수심명 · <a href="https://blog.naver.com/omyman" target="_blank" rel="noopener">blog.naver.com/omyman</a><br>빅데이터 13 부록 · 인터넷 없이 동작</footer>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const CPN=[[27553,35200,27855,22337,23545,27194,37787,22176,29269,25096,32597,33177,18278,49095,31517,25925,22848,27924,30255,34761,30045,33872,17120,23981,21948,31317,33664,18271,28657,35804,37321,21077,34503,32707,26513,45704,21050,27781,33638,31945,28630,41015,41563,37301,38013,29561,20682,47502,22340,47834],[19274,33478,24083,31863,39951,44651,35600,25955,27190,34265,22096,29459,34839,37348,27623,32958,40900,32442,16269,31715,32011,26629,30344,18190,39969,33372,25652,31885,31060,23090,8663,7220,46174,21046,27645,34572,27106,39534,22411,34503,13303,35718,35502,32936,32409,32146,36913,37700,22445,38460],[21511,26286,20320,6469,21264,15832,41150,33793,24870,30540,33325,44013,36227,42224,33909,40449,41582,37490,30301,38805,26901,41476,27860,24609,45131,26769,31363,21549,24461,27344,22148,39825,24264,20013,38977,35721,11455,25508,38024,23915,27838,28146,12004,22970,36229,41678,29488,29257,34559,31473],[23676,24641,41383,33827,23865,20737,21943,30227,21166,29936,40780,27947,36835,17826,32848,32328,22613,41030,29944,24487,27647,37617,19009,31189,22305,31812,25766,29408,36082,30336,34412,35589,33255,31808,30340,35100,39636,44733,44082,22056,32350,33913,39726,38509,18545,32205,16315,26203,22584,25101],[15382,45689,31312,9258,43582,18611,46450,44546,37047,30013,22990,37659,26791,38729,27761,17346,24374,30507,26066,31146,22602,43008,25824,34231,16601,36721,42501,34922,28126,22633,34975,34769,19639,30248,34479,23856,35006,27956,41802,19917,34336,31085,15054,22650,23246,37604,27238,30051,31311,50848],[32420,35276,29251,36537,39183,39978,27314,34156,24913,29323,38607,29159,26384,25245,34152,42931,37417,28211,36423,37618,41740,24598,35104,26798,25656,40051,34381,30615,40891,31342,22935,37282,22595,23053,26672,28748,37196,27166,15454,25463,32514,29038,29033,20250,26889,34634,34772,23335,24203,22246],[23379,46111,34960,26628,35256,28022,40311,26632,41512,21490,30881,29511,22849,27458,30136,20525,23217,33949,23901,42719,42700,26279,32899,34306,35807,25765,35996,25785,29254,40007,29371,22321,25445,32600,23929,22247,31227,22465,46826,24666,35542,18315,27342,36593,34318,35163,25422,31563,28428,18737],[28147,39743,23283,23530,26737,27037,41187,27690,39364,36477,35913,35192,32941,34311,39845,13806,32987,39442,24865,29739,36960,16017,32437,21306,31905,33030,31986,21928,30088,24956,32473,27022,23274,37535,20262,25967,38715,32927,36991,22031,31398,22958,15833,34668,21745,30884,22359,34392,34566,21838],[24887,22632,51519,37323,26620,36609,38831,31781,26766,37864,36068,35496,16552,33501,46515,21239,26689,23601,25882,28736,46210,27508,42857,22307,35062,29544,26584,32247,40789,33194,35352,30704,33952,33369,36744,29112,25329,26360,26206,34505,23701,35999,32145,40379,31895,38879,33726,31718,27787,34020],[51586,36235,28994,44141,22331,39747,24720,30246,25426,23691,25167,31349,27382,44638,30498,8310,23705,27318,31999,34315,18937,30976,22420,29913,26926,39191,37296,41471,22869,24963,29394,24544,23976,33146,46739,31697,41659,17613,45249,46737,30550,25089,34074,15760,31536,15038,41898,28844,23154,12306],[46590,29401,23544,41388,36937,36764,34767,28047,43932,36472,20275,20721,24597,36643,24861,27660,26109,30385,39676,26360,29967,43596,17610,32477,31503,29385,38086,47461,30083,29680,35159,20656,27205,32526,31798,24191,38816,20973,24477,22005,33138,36523,29235,39299,26774,30817,31819,29806,31494,21953],[23518,18397,17629,38138,27223,44689,26922,27885,28255,35198,44227,22755,36628,41546,29152,27283,39181,25604,28210,22878,26319,32650,33438,28696,31177,20024,47018,21730,34492,23983,30299,14053,24660,20299,32739,30895,22700,22178,33335,26088,34702,32294,26236,27782,15157,29805,28103,29774,41687,31105],[25107,18395,26010,27447,18088,33516,26549,20914,30405,42857,41310,39212,39197,38062,36124,37311,46473,27292,36949,19485,35683,41533,27688,44133,22898,42857,28477,33477,27418,35528,29157,39427,30614,32489,28441,33863,26720,28534,19409,26703,27255,29213,30791,18066,36752,48209,30645,14771,36710,30435],[22082,31794,24895,33780,45318,37210,10467,39141,26015,32409,32912,32128,16038,40265,22642,23014,32128,35878,25689,17588,33621,27945,37036,40087,20402,20151,28955,23394,43766,31211,31317,32345,42275,33867,37055,25038,36521,27453,26118,25920,39994,27865,33649,31249,34505,25751,19777,27761,31153,23505],[25267,29453,38632,31627,35821,31035,31613,25445,29587,37321,38959,20772,25092,31492,29059,23590,13616,32330,24489,46557,39523,33572,19620,24293,39068,23827,28150,33635,35028,27285,34237,16745,30092,29148,43603,33523,12152,42497,51950,34684,35747,42966,30072,29767,32129,3474,25569,35483,34934,17755],[35446,42377,33849,23794,37935,17704,36415,28962,33151,20298,30529,24849,23076,41203,34080,26929,24616,26882,31246,32541,30645,16095,30045,31826,35868,29658,28626,30435,25596,46495,23794,22117,32078,31956,34995,28444,25339,22827,29876,31979,29463,20044,19373,38645,30049,28416,44154,37185,19243,27406],[28455,33494,16741,31993,16112,40256,23901,26085,34295,32738,25430,28353,43429,22343,42265,25667,20373,40310,35220,30989,38492,29134,26854,34992,32955,25392,40882,34355,43970,58676,21064,35650,34241,21864,35355,10763,21320,37114,19556,25200,29738,19954,24775,32922,30795,28132,40523,28450,36198,30797],[37214,41164,17127,24991,26477,36230,33340,32567,31771,37743,32822,22463,22455,24934,44785,33286,36142,44053,33490,14351,32840,25528,25974,24582,29106,20493,38088,35487,33834,33322,21776,37286,22403,17124,27569,31361,31795,39003,27243,40239,43035,33319,22192,41319,30714,31886,19007,15873,43280,36980],[37885,37565,24472,35062,15630,29177,21800,31746,31958,19351,20912,25989,27395,27868,30914,26383,45904,33530,24997,40010,35422,39542,39553,21712,27364,29464,18280,34954,24451,35828,36470,27182,15273,35852,24222,35290,14828,42027,32069,36598,31712,41808,43720,24895,27772,35163,37664,13945,32831,19690],[29681,32773,35081,40486,15100,38696,27986,32977,24625,31083,44806,14588,34209,30927,28260,30548,34247,27301,30277,29310,32384,27912,29713,37198,34091,41469,27603,15252,29957,23146,22478,32361,27700,33159,43696,44501,33809,36007,37949,40545,19887,17112,41914,23945,14602,29756,22378,39858,40251,33332]];
+const NOC=[[23577,31943,16749,35249,39148,26379,33444,32007,26845,23101,13740,41283,29619,50179,36610,32222,24741,41140,25950,42560,26813,31488,17819,48746,29248,26919,36487,22869,36141,20630,34362,21647,15303,25250,18289,34426,30173,34076,30730,27169,30225,38420,28535,23904,22241,28226,24002,45045,20571,21347],[28983,31854,28647,37665,25935,44746,34280,31397,25439,32244,29974,45200,37489,17520,42233,11015,42327,14912,30006,36499,29938,21215,39866,15763,18318,41071,23080,31973,36479,29148,32212,30965,31713,39496,37474,32588,37340,25666,23885,21986,36273,42998,30680,14171,25930,33744,32376,30750,37911,37413],[22419,31317,27978,33845,27344,33239,26169,22330,38542,34580,34112,37652,21522,37315,21547,33046,28570,32175,35579,30171,22635,37437,39417,35481,38294,15895,30577,29087,14366,30870,30026,17949,23280,30681,34815,35661,21157,21384,25956,29601,25400,28465,35678,35476,31105,20870,26072,34510,36962,38498],[34219,23152,30336,34196,34930,17701,36731,31087,31409,16003,30477,17518,9975,30932,30145,30648,31606,30208,39021,36716,43257,50481,36475,36711,45522,23356,27747,32401,17904,38091,42995,20285,23837,37548,41144,17043,34608,28582,15414,26779,25585,30960,30391,27879,28994,28801,34154,37767,37717,22892],[42652,25655,25996,30981,38566,16378,42999,23879,22036,31010,35370,51643,37158,25228,28321,22304,35205,36580,27279,39008,16428,26104,22531,25203,16827,37558,22282,28845,39376,42780,39363,12034,27469,27087,24418,23611,25465,34600,26192,19112,17247,31048,16095,35520,25931,25860,31752,27034,35613,19630],[28191,45652,28602,17424,23536,20098,27104,18328,22730,45425,31995,32757,44669,16808,34611,26280,29806,24582,31016,39974,39727,32053,36661,20488,6596,38425,46376,33816,25121,30452,39863,20692,30648,34986,21815,46844,36593,43390,21406,31798,42349,33668,40175,15209,29344,14035,26028,32367,29136,19932],[37476,24014,27825,23416,22725,28961,37182,25405,39369,29557,35785,49832,48151,32316,30640,28806,35701,15046,24379,28922,23898,22056,40380,18333,26557,25360,26256,21630,36100,29076,43937,19084,30980,19758,31838,39335,20867,37917,23473,20837,32611,35970,31065,32493,29732,25932,12799,27051,24370,34403],[39164,24584,28146,36883,35287,50794,29444,41566,29182,30290,38680,35377,26044,29388,31512,43591,23975,31903,34947,31191,26029,36767,22659,45601,9084,14523,31381,35231,33801,25385,28915,30279,23028,27083,22510,39406,33461,26643,27116,26469,27594,32278,27259,26046,33174,28797,30123,30724,28644,21150],[21805,8673,26169,28033,24016,35508,29243,29933,24890,17818,30369,36679,39629,31320,19812,27219,31138,21062,26894,24725,23403,21676,32388,34234,39751,27782,30414,16052,32167,40864,23663,33889,25730,34078,35733,18312,22710,23937,28276,40407,30249,30992,31447,24705,38595,34060,36222,32000,18940,34233],[30965,25173,26234,14587,39551,39387,26346,19958,35597,39137,29919,24801,40375,37283,38416,45381,29866,31482,46358,36942,50071,9181,17773,34761,33760,20755,22376,22786,34864,18254,28423,23400,5346,31705,44321,27805,35531,29779,27840,15989,27920,13107,24304,30410,30656,22784,28014,20936,35458,20098],[40806,30028,24910,38876,18541,38124,39982,27367,39195,43209,23752,24158,36407,35943,23647,4824,17508,39751,25904,22359,32888,15779,47741,14350,28315,32932,34822,20980,27135,38172,30950,35342,31159,31492,23017,20446,27716,20931,41386,35682,39831,17976,19455,35139,31208,31739,37678,21827,19716,23016],[13404,25705,27058,28167,21742,20069,46102,36040,32728,31390,24986,28961,39164,38070,25545,26188,25880,24440,37377,35222,32598,25285,40099,30269,10093,40170,31893,25331,40502,11329,24794,35471,24301,46286,45858,32326,31860,43854,35121,21784,28115,23148,35036,31581,41398,32268,24082,21270,42277,40408],[30117,29961,26605,41354,29757,40182,35699,24153,31805,39009,27197,30781,28363,28552,36345,23610,27554,31404,9170,27583,30857,33156,24881,22506,36990,24528,33552,30673,24040,26225,23725,37913,31526,16281,44799,41162,40192,22775,26076,25409,41760,30773,32408,28215,19058,37249,48015,27971,23024,24802],[28754,31658,30551,28757,34927,32534,27982,36155,40616,40868,22708,31114,35603,31971,29733,39952,33461,34448,18769,19384,26761,32183,38103,24520,43381,32195,27017,37135,42218,31338,31153,33015,36973,29006,30481,32092,29593,33594,25128,15072,26462,27604,45572,38981,33607,26600,21106,25154,34325,29229],[30041,35623,14249,42216,38272,32763,39776,14307,31783,33556,34379,34054,45109,36062,25584,18895,22755,27442,32149,30322,32419,25808,27178,33474,28451,24951,26594,33967,26021,27705,44725,29193,31750,39061,44015,35666,19842,49274,22880,20796,23575,41757,29705,14823,45079,17528,45056,9727,29005,30253],[28046,25511,24182,37506,22844,28155,35096,22457,29666,21814,29561,28812,34798,25975,27346,16700,24481,21227,19101,26624,29481,29018,38474,25154,23645,12322,38701,35332,34837,23532,24808,25122,19223,32728,28913,39571,31242,28089,35093,35508,21025,16764,20347,37199,34901,40633,30379,32918,26687,45687],[37519,34867,32321,42575,19260,36531,25867,39740,29640,17247,32123,10031,38986,32844,39699,32662,31808,41973,36807,18765,26200,42307,20830,20154,23525,18182,31082,28311,37950,27592,42710,27542,37126,39328,32912,28299,19123,21030,34193,26647,34593,24194,29777,30278,35601,26895,35481,16510,19419,30499],[19213,22680,34409,18772,31776,35385,21379,15654,38949,43930,32040,43867,34918,25833,31478,35675,4544,32357,40198,35996,27462,27734,15134,36778,12496,36333,33243,26876,34227,37823,26027,19282,37424,29377,32215,21367,41417,37246,19324,15264,32081,28560,24843,24175,29190,31140,31452,43664,42618,11764],[24387,26997,20876,30446,14022,37021,33816,39498,31167,35525,34011,34622,25721,39308,19889,26061,29777,48841,22449,32655,33699,16995,49838,38736,32821,28626,36561,11882,43389,27629,38451,21981,25202,11048,27777,29518,24430,42700,28812,29004,22269,34615,25981,28953,21714,39263,41068,27595,33245,25025],[40772,34205,23563,24070,44327,46107,30739,27883,36428,23478,30508,34542,34721,35728,29882,29190,20851,15713,34546,29463,42997,35500,17858,38169,24263,28386,25291,14700,42781,29168,33415,26851,22344,25212,44098,25606,20938,46393,27405,24173,39132,23708,33321,30008,23202,19822,40602,37588,46029,31320]];
+const INC=[74948,4753,28307,15667,16788,19354,6555,19165,13107,161749,25222,17826,18606,14753,11695,17423,29412,19089,39130,19538,22349,55686,30548,16266,19738,30464,70337,18736,19032,40191,12941,18490,37404,31201,23270,32927,4036,40651,12385,8094,26000,33534,16867,11547,22374,21340,51193,34491,24743,42915,19471,12638,31271,31242,19363,13771,25273,4933,33325,29579,8239,22852,12352,34694,6500,12725,33717,44083,6034,16337,26818,15283,57204,10778,27248,11742,51204,21742,17618,7856,60421,34602,34618,43596,27161,15010,13628,13628,50113,9171,15401,18165,25204,31108,10410,7801,21968,45622,34691,25069,18210,26264,19034,35966,13675,23874,20610,30516,25205,101724,54133,54070,6479,17958,15288,30322,5612,44565,41781,10085,12245,13620,22606,32357,75262,19566,34909,24179,63320,34382,50068,11538,19627,13517,54337,32682,18341,16790,29460,14459,12602,29400,96556,19002,15780,10909,9887,30182,36698,22148,26891,23613,23937,8816,16733,23550,13768,16550,13474,18032,36749,17258,20084,35891,32431,60908,6284,36832,16492,23880,36411,42191,41094,24175,57861,18587,20240,35583,15822,80543,40600,81255,21678,17503,24349,34226,15484,27662,21805,58070,14800,41262,14968,12377,14383,10785,24048,40895,24309,32035,58648,25900,24763,18675,8392,34747,7678,32585,21838,43307,21149,13441,27303,15738,19760,22587,20318,19667,13367,19664,6106,20042,10734,43138,47191,6832,24027,20418,11754,30303,16697,7627,18770,20152,23479,10522,31870,34244,11076,14834,20990,15685,62709,24960,12012,13727,21280,87332,19792,23777,29984,21502,86543,16012,34424,24252,31975,10873,63632,20478,22483,12569,14217,30901,39811,34612,45496,33816,22406,36385,31450,20737,34052,47640,25355,17788,33902,68901,19412,20840,20296,45881,7315,27433,45042,13521,53819,30369,15845,24897,8772,15688,65916,12884,66619,20974,40007,22614,5739,15622,24684,11042,9814,27439,14918,7963,14611,36918,16577,38594,55070,22460,11183,10088,21682,37370,25885,30588,16882,26377,16601,18118,10144,8576,16495,11333,12391,32946,20656,126560,38400,15064,35130,27285,14597,42683,13833,3516,35470,15209,53724,14916,10842,55775,11553,24885,52567,23593,20987,23423,36440,13574,31773,31140,89288,17999,12722,34249,17356,26199,23850,44402,14852,20840,4763,12912,55371,14634,14460,10607,31191,24509,10806,32875,25747,34628,14990,62493,28167,20535,16134,19017,36874,18744,42061,31207,49409,35899,21210,7005,26348,35364,24288,30757,16598,17531,12514,49868,24222,16391,9906,20091,52343,29061,14261,51932,51902,39675,35358,44064,30514,35066,13794,54162,25304,74201,6468,33632,39691,17930,28896,34510,31146,15934,20228,40596,47401,23374,23068,24842,41052,11703,9923,23732,11340,15487,23197,29422,11577,35631,7599,30554,8547,10250,32381,17261,13666,16867,29115,21324,21642,41476,14331,16595,16099,44416,39928,47679,21585,20049,36742,17385,36257,34016,14487,20954,20506,62318,104057,20745,22213,5603,25007,21934,11571,35290,8609,19362,23940,10411,36829,41495,9587,9464,31614,21627,10648,18451,20650,20215,36188,27737,63683,50242,33093,42035,48742,33644,10557,36888,23003,58179,23297,30200,26844,60399,24497,18737,26515,16921,24276,21928,25925,69841,17268,22521,19542,32977,10841,14536,21511,30567,21423,16315,13094,29943,52330,26735,24659,28748,12512,18270,18756,26295,21607,10616,43267,60806,18809,27982,25856,35270,9065,57977,16635,47030,23119,17436,20246,37734,13122,17587,16493,7869,48062,31174,21747,44276,12409,21077,62022,39648,5795,2983,11817,41638,16590,19329,31728,12950,25027,35428,29150,27933,15348,29989,17042,48193,102956,14130,5975,17064,27615,41360,42083,13761,13685,47117,11437,42368,19223,34886,33648,35101,36035,12166,26331,22212,26504,46164,18720,14369,14230,18279,34599,13509,44159,26220,19232,9907,25513,33352,7635,45034,59198,26987,29586,93734,46126,12853,21808,20047,20120,5332,34690,15032,24299,20299,37148,18444,13667,30317,51171,18181,50110,25779,16000,55000,13478,40475,16335,28858,10504,13326,41732,24658,22538,16918,28793,9525,11249,20037,13352,14467,21101,20282,19274,59824,40402,46066,21657,16272,9206,17874,6301,15518,34841,58274,39315,13135,29601,13719,36090,20603,36861,103129,38312,89274,24501,18073,49032,61983,15788,23063,9314,19535,37534,20914,15654,9468,27473,35544,31505,25673,10255,63392,21292,20194,34192,6015,21191,20291,27539,49429,29241,7337,17972,24917,24060,10211,8117,30620,27068,21747,7822,63859,3866,17704,77241,20041,25317,10856,49771,10142,25659,23884,11726,37503,9418,14617,21650,17197,29164,38347,18467,15917,16152,17688,35803,19331,28130,20854,13271,36984,11816,22109,53756,11432,21309,8511,16226,8984,17731,15947,23841,56987,26103,32693,21366,19021,13355,7476,22952,58541,29313,15988,59257,16991,15195,10640,12367,19000,73087,19463,11862,15317,19270,7887,23765,33537,26702,31585,10161,7949,47636,42472,8742,24930,22366,30544,24963,16297,24764,24203,21393,7248,3651,13710,8260,25630,33849,25793,17646,22978,44374,14224,38307,33677,25771,52636,14319,38774,12615,13902,11663,28782,12533,22727,11136,41763,66284,25226,59043,30835,80950,23384,8585,53871,20418,11831,14857,8302,19918,11582,53665,32817,8134,8905,15675,6939,20622,21460,13854,15869,29712,51690,54036,22485,36809,14143,28203,12384,34124,10477,12344,21916,30767,9294,15963,23887,25271,13316,23345,18763,51139,30765,9952,5879,23387,44768,24447,37393,16468,9717,34515,23374,33197,9615,24561,15134,35737,15546,15299,15500,47015,22411,13961,11926,11773,52975,7414,13224,32297,44672,20151,35288,34744,39804,22649,59455,25076,55766,11503,39197,10498,9087,30191,13632,29325,11807,58937,22635,11424,25069,38348,14241,30855,77343,38150,22551,16128,32128,9149,3671,15244,11884,64855,24774,12619,11349,30788,13867,16101,21629,24106,24254,24530,50046,63653,8510,107772,24822,48480,14751,27956,26174,24629,38385,33639,12596,21460,35670,34792,18834,19470,21010,11879,10643,59087,18180,24402,14711,50195,65945,20196,31378,14650,66450,40162,13922,48723,28600,29532,28548,15420,16674,33447,22339,13024,77809,20275,16431,15119,34761,41225,26615,38679,9339,18363,17302,23008,30736,6741,149457,13608,28146,37586,38099,26395,3981];
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),1800);}
+let touched=false;document.addEventListener('pointerdown',()=>{touched=true;},{once:true,capture:true});
+const vib=n=>{if(!touched)return;try{navigator.vibrate&&navigator.vibrate(n);}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function prep(cv,ratio){const dpr=Math.min(2,window.devicePixelRatio||1),w=cv.clientWidth||320,h=Math.round(w*ratio);
+  cv.width=w*dpr;cv.height=h*dpr;cv.style.height=h+'px';const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return{c,w,h};}
+function T(c,s,x,y,col,size,al,bl,wt){c.fillStyle=col;c.font=`${wt||''} ${size||12}px -apple-system,"Malgun Gothic",sans-serif`;c.textAlign=al||'center';c.textBaseline=bl||'middle';c.fillText(s,x,y);}
+function single(sel,attr,fn){$$(sel).forEach(b=>b.onclick=()=>{$$(sel).forEach(x=>x.classList.toggle('on',x===b));vib(8);fn(b.dataset[attr]);});}
+function quiz(id,ans,fn){$$(`#${id} button`).forEach(b=>b.onclick=()=>{const ok=b.dataset.a===ans;$$(`#${id} button`).forEach(x=>x.className=x.dataset.a===ans?'right':x===b?'wrong':'');vib(ok?[30,40,60]:80);$(`#${id}Msg`).innerHTML=fn(ok);});}
+function rng(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){let u=0,v=0;while(!u)u=r();while(!v)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function rr(c,x,y,w,h,r){r=Math.min(r,Math.abs(w)/2,Math.abs(h)/2);c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+function arrow(c,x0,y0,x1,y1,col,lw){const a=Math.atan2(y1-y0,x1-x0);c.strokeStyle=col;c.fillStyle=col;c.lineWidth=lw||2;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1-6*Math.cos(a),y1-6*Math.sin(a));c.stroke();c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.45),y1-9*Math.sin(a-.45));c.lineTo(x1-9*Math.cos(a+.45),y1-9*Math.sin(a+.45));c.closePath();c.fill();}
+const CA='#7cc4ff',CB='#ff9b5c',GO='#ffd166',OK='#6fdc9a',BAD='#ff7d7d',PU='#b79cff',MU='#a3b0c2',FG='#eff3f8';
+const f2=(v,d=2)=>(+v).toFixed(d);const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+
+const pct=v=>(v*100).toFixed(0)+'%';
+
+/* ---- 통계 도구: t분포 (불완전 베타 함수) ---- */
+function lnG(z){const g=[676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];if(z<.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lnG(1-z);z-=1;let x=.99999999999980993;for(let i=0;i<8;i++)x+=g[i]/(z+i+1);const t=z+7.5;return .5*Math.log(2*Math.PI)+(z+.5)*Math.log(t)-t+Math.log(x);}
+function betacf(a,b,x){let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<1e-300)d=1e-300;d=1/d;let h=d;for(let m=1;m<300;m++){const m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<1e-300)d=1e-300;c=1+aa/c;if(Math.abs(c)<1e-300)c=1e-300;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<3e-14)break;}return h;}
+function ibeta(x,a,b){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lnG(a+b)-lnG(a)-lnG(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+const pT=(t,df)=>ibeta(df/(df+t*t),df/2,.5);   /* 양측 p값 */
+const tPdf=(t,df)=>Math.exp(lnG((df+1)/2)-lnG(df/2)-.5*Math.log(df*Math.PI)-(df+1)/2*Math.log(1+t*t/df));
+function ttest(a,b){const n1=a.length,n2=b.length,m1=a.reduce((s,v)=>s+v,0)/n1,m2=b.reduce((s,v)=>s+v,0)/n2;let s1=0,s2=0;a.forEach(v=>s1+=(v-m1)**2);b.forEach(v=>s2+=(v-m2)**2);const sp=(s1+s2)/(n1+n2-2),t=(m1-m2)/Math.sqrt(sp*(1/n1+1/n2));return{t,p:pT(t,n1+n2-2),m1,m2,df:n1+n2-2};}
+const TT=CPN.map((c,g)=>ttest(c,NOC[g]));
+
+/* ===== ① 첫 장면 ===== */
+let bf=0,hkSel=8;
+function hkDraw(){const th=bf?0.05/20:0.05;const{c,w,h}=prep($('#hkCv'),.62);const L=46,R=w-10,Tp=14,B=h-24,bw=(R-L)/20,mx=3,Y=v=>B-(B-Tp)*Math.min(v,mx)/mx;
+  [[0.05,'0.05',bf?'#5a6b85':GO],[0.0025,'0.0025',bf?GO:'#5a6b85']].forEach(([p,l,col])=>{const y=Y(-Math.log10(p));c.strokeStyle=col;c.setLineDash([4,4]);c.beginPath();c.moveTo(L,y);c.lineTo(R,y);c.stroke();c.setLineDash([]);T(c,l,L-4,y,col,9,'right');});
+  [1,.1].forEach(p=>T(c,String(p),L-4,Y(-Math.log10(p)),'#5a6b85',9,'right'));
+  TT.forEach((r,g)=>{const v=-Math.log10(r.p),sig=r.p<th,x=L+g*bw;c.fillStyle=sig?BAD:g===hkSel?CA:'#2f6fd0';rr(c,x+2,Y(v),bw-4,B-Y(v),3);c.fill();if(g===hkSel){c.strokeStyle=FG;c.lineWidth=1.5;rr(c,x+1,Y(v)-1,bw-2,B-Y(v)+2,3);c.stroke();}T(c,String(g+1),x+bw/2,B+11,g===hkSel?FG:'#5a6b85',9);});
+  T(c,'p값 (로그 눈금, 위로 갈수록 작음)',R,Tp-4,MU,9,'right');
+  const r=TT[hkSel];$('#hkOut').innerHTML=`무리 ${hkSel+1}: 쿠폰 평균 ${fmt(r.m1)}원 vs 없음 ${fmt(r.m2)}원\nt = ${f2(r.t,3)},  p = <span class="${r.p<th?'e':'o'}">${f2(r.p,4)}</span>  ${r.p<th?'< ':'≥ '}${bf?'0.0025':'0.05'} → ${r.p<th?'"유의"':'차이 없음'}`;
+  const ns=TT.filter(r=>r.p<th).length;$('#hkMsg').innerHTML=bf?`<div class="res g">기준을 검정 횟수로 나누면 0.05 / 20 = <b>0.0025</b>. 아홉 번째 무리의 0.0136은 이 기준을 넘지 못합니다 → 유의한 무리 <b>${ns}개</b>. 이 데이터는 <b>쿠폰 효과가 0이 되도록</b> 컴퓨터로 만든 것이었습니다 — 본페로니 보정.</div>`:`<div class="res r">19개는 차이가 없는데 <b>9번 무리만 p = 0.0136</b> &lt; 0.05. "이 무리에는 쿠폰이 효과가 있다?" — 하지만 효과가 없어도 스무 번 보면 하나쯤 걸릴 확률이 <b>64%</b>. 9번은 그 우연에 <b>당첨</b>된 것입니다.</div>`;}
+single('[data-bf]','bf',v=>{bf=+v;hkDraw();});
+$('#hkCv').addEventListener('pointerdown',e=>{const rc=e.target.getBoundingClientRect(),x=e.clientX-rc.left,L=46,bw=(rc.width-56)/20;const g=Math.floor((x-L)/bw);if(g>=0&&g<20){hkSel=g;hkDraw();vib(8);}});
+quiz('q1','b',ok=>`<div class="res ${ok?'g':'r'}">${ok?'정답!':'아쉬워요.'} 정답은 <b>약 64%</b>. 한 번도 안 걸릴 확률 0.95²⁰ ≈ <b>0.36</b>, 1에서 빼면 <b>0.64</b>. 원고 모의실험 4,000회: 64.9%. 5%는 <b>한 번만</b> 검정할 때의 이야기 — 여러 번 보면 하나쯤 우연히 걸리는 것이 오히려 보통입니다. ↓ 직접 실험해 보세요.</div>`);
+
+/* 모의실험 */
+let smR=rng(77),smN=0,smHit=0,smHist=[];
+function smRun(k){for(let s=0;s<k;s++){let hit=false;for(let g=0;g<20;g++){const a=[],b=[];for(let i=0;i<50;i++){a.push(gauss(smR));b.push(gauss(smR));}if(ttest(a,b).p<.05)hit=true;}smN++;if(hit)smHit++;smHist.push(smHit/smN);}}
+function smDraw(){$('#smN').textContent=fmt(smN);$('#smP').textContent=smN?f2(smHit/smN*100,1)+'%':'-';const{c,w,h}=prep($('#smCv'),.45);const L=34,R=w-10,Tp=10,B=h-20,N=Math.max(smHist.length,200),X=i=>L+(R-L)*i/N,Y=v=>B-(B-Tp)*v;
+  [0,.5,1].forEach(v=>{c.strokeStyle='#1e2633';c.beginPath();c.moveTo(L,Y(v));c.lineTo(R,Y(v));c.stroke();T(c,(v*100)+'%',L-4,Y(v),'#5a6b85',9,'right');});const th=1-Math.pow(.95,20);c.strokeStyle=GO;c.setLineDash([4,4]);c.beginPath();c.moveTo(L,Y(th));c.lineTo(R,Y(th));c.stroke();c.setLineDash([]);T(c,'64.2%',R,Y(th)-8,GO,9,'right');
+  c.strokeStyle=BAD;c.lineWidth=2;c.beginPath();smHist.forEach((v,i)=>i?c.lineTo(X(i),Y(v)):c.moveTo(X(i),Y(v)));c.stroke();T(c,'세트 수 →',R,B+12,MU,9,'right');}
+$('#smRun').onclick=()=>{smRun(200);smDraw();vib(15);};$('#smClr').onclick=()=>{smR=rng(77+Math.floor(Math.random()*1e5));smN=0;smHit=0;smHist=[];smDraw();};
+function mtDraw(){const m=+$('#mtM').value;$('#mtMv').textContent=m;const{c,w,h}=prep($('#mtCv'),.45);const L=34,R=w-10,Tp=10,B=h-20,X=k=>L+(R-L)*(k-1)/59,Y=v=>B-(B-Tp)*v;
+  [0,.5,1].forEach(v=>{c.strokeStyle='#1e2633';c.beginPath();c.moveTo(L,Y(v));c.lineTo(R,Y(v));c.stroke();T(c,(v*100)+'%',L-4,Y(v),'#5a6b85',9,'right');});
+  c.strokeStyle=BAD;c.lineWidth=2;c.beginPath();for(let k=1;k<=60;k++){const v=1-Math.pow(.95,k);k>1?c.lineTo(X(k),Y(v)):c.moveTo(X(k),Y(v));}c.stroke();c.strokeStyle=OK;c.beginPath();for(let k=1;k<=60;k++){const v=1-Math.pow(1-.05/k,k);k>1?c.lineTo(X(k),Y(v)):c.moveTo(X(k),Y(v));}c.stroke();
+  c.fillStyle=GO;c.beginPath();c.arc(X(m),Y(1-Math.pow(.95,m)),5,0,7);c.fill();T(c,'— 각각 0.05',L+4,Tp+6,BAD,10,'left','middle','700');T(c,'— 본페로니 0.05/m',L+4,Tp+20,OK,10,'left','middle','700');[1,20,40,60].forEach(k=>T(c,String(k),X(k),B+12,'#5a6b85',9));
+  $('#mtOut').innerHTML=`검정 ${m}번, 각각 0.05 → 적어도 하나 걸릴 확률 1 − 0.95^${m} = <span class="e">${f2((1-Math.pow(.95,m))*100,1)}%</span>\n본페로니 기준 0.05/${m} = ${(.05/m).toPrecision(2)} → <span class="o">${f2((1-Math.pow(1-.05/m,m))*100,1)}%</span>  <span class="p"># 전체 오류율을 5% 안으로</span>`;}
+$('#mtM').oninput=mtDraw;
+
+/* ===== ② ===== */
+const SM=[['S','구체적 (Specific)','무엇을? 막연함','재구매율'],['M','측정 가능 (Measurable)','얼마나? 없음','20% → 25%'],['A','달성 가능 (Achievable)','판단 불가','5%p, 현실적 범위'],['R','관련 (Relevant)','어느 목표와?','재구매 = 매출의 핵심 동력'],['T','기한 (Time-bound)','언제까지? 없음','다음 분기까지']];let smM='bad';
+function smTable(){$('#smTb').innerHTML=`<tbody>${SM.map(([k,n,b,g])=>`<tr><th style="color:#ffd166;width:30px">${k}</th><td style="text-align:left">${n}</td><td style="text-align:left;color:${smM==='bad'?'#ff7d7d':'#6fdc9a'}">${smM==='bad'?'✗ '+b:'✓ '+g}</td></tr>`).join('')}</tbody>`;}
+single('[data-sm]','sm',v=>{smM=v;smTable();});
+const HY=['<div class="res r">"좋다"는 <b>데이터로 확인할 수 없고</b> 뜻도 여러 가지(매출? 만족? 방문?). 가설이 없으면 데이터는 숫자의 나열일 뿐입니다.</div>','<div class="res g">확인할 수 있고, 뜻이 하나로 분명하고, 문제의 핵심(매출)과 이어집니다.<br><b>귀무가설 H₀</b>: 쿠폰 받은 쪽과 안 받은 쪽의 평균 구매액이 <b>같다</b><br><b>대립가설 H₁</b>: 평균이 <b>다르다</b><br>검정 = 데이터로 H₀를 밀어낼 수 있는지 따지기.</div>'];
+single('[data-hy]','hy',v=>{$('#hyBox').innerHTML=HY[+v];});
+function pvDraw(){const g=+$('#pvG').value-1;$('#pvGv').textContent=g+1;const r=TT[g],df=r.df,t=Math.abs(r.t);const{c,w,h}=prep($('#pvCv'),.5);const L=10,R=w-10,B=h-24,Tp=12,X=v=>L+(R-L)*(v+4)/8,Y=v=>B-(B-Tp)*v/.42;
+  c.fillStyle='rgba(255,125,125,.55)';[[t,4],[-4,-t]].forEach(([a,b])=>{c.beginPath();c.moveTo(X(a),B);for(let v=a;v<=b+1e-9;v+=.02)c.lineTo(X(v),Y(tPdf(v,df)));c.lineTo(X(b),B);c.closePath();c.fill();});
+  c.strokeStyle=CA;c.lineWidth=2;c.beginPath();for(let v=-4;v<=4;v+=.02){v>-4?c.lineTo(X(v),Y(tPdf(v,df))):c.moveTo(X(v),Y(tPdf(v,df)));}c.stroke();
+  c.strokeStyle=GO;c.lineWidth=2;c.beginPath();c.moveTo(X(r.t),Tp);c.lineTo(X(r.t),B);c.stroke();T(c,`t = ${f2(r.t,2)}`,X(r.t)+(r.t>0?-4:4),Tp+6,GO,10,r.t>0?'right':'left','middle','800');[-2,0,2].forEach(v=>T(c,String(v),X(v),B+12,'#5a6b85',9));
+  $('#pvOut').innerHTML=`무리 ${g+1}: 차이 ${fmt(r.m1-r.m2)}원,  t = ${f2(r.t,3)} (자유도 ${df})\np = 빨간 두 꼬리 넓이 = <span class="${r.p<.05?'e':'o'}">${f2(r.p,4)}</span>\n<span class="p">"차이가 없다면, 지금만큼 또는 더 큰 차이가 우연히 나올 확률"</span>`;}
+$('#pvG').oninput=pvDraw;
+const MIS=[['p = 0.0136이면 귀무가설이 맞을 확률이 1.36%다',false,'p값은 귀무가설이 <b>맞다고 할 때</b> 이런 차이가 나올 확률. 귀무가설이 맞을 확률이 아닙니다.'],['p값이 작을수록 효과가 크다',false,'p값은 <b>효과의 크기</b>를 말하지 않습니다. 표본이 아주 크면 아주 작은 차이도 p가 작아집니다. 크기는 평균 차이로 따로 봅니다.'],['효과가 전혀 없어도 스무 번에 한 번꼴로 p &lt; 0.05가 나온다',true,'바로 이것이 0.05의 뜻 — 그리고 첫 장면의 열쇠입니다.']];const misSeen=new Set();
+$('#mis').innerHTML=MIS.map((m,i)=>`<button data-mi="${i}">${m[0]}</button>`).join('');$$('[data-mi]').forEach(b=>b.onclick=()=>{const i=+b.dataset.mi;misSeen.add(i);b.className=MIS[i][1]?'right':'wrong';$('#misMsg').innerHTML=`<div class="res ${MIS[i][1]?'g':'r'}">${MIS[i][1]?'✓ 맞는 말':'✗ 오해'} — ${MIS[i][2]}</div>`;vib(10);});
+
+/* ===== ③ ===== */
+$('#spTb').innerHTML=`<thead><tr><th>열 이름</th><th>자료형</th><th>설명</th><th>역할</th></tr></thead><tbody>${[['customer_id','str','고객 번호','키',GO],['signup_month','datetime','처음 가입한 달','코호트 기준',PU],['purchased_at','datetime','구매 일시','시간 기준',CA],['segment','int','무리 번호 1~20','그룹',MU],['coupon','bool','쿠폰 받음 여부','비교 기준(처치)',CB],['amount','int','구매액(원)','목표 변수',OK]].map(([a,b,c2,d,col])=>`<tr><td>${a}</td><td>${b}</td><td>${c2}</td><td style="color:${col};font-weight:700">${d}</td></tr>`).join('')}</tbody>`;
+function fnDraw(){const V=+$('#fnV').value,a=+$('#fnA').value/100,b=+$('#fnB').value/100,cc=+$('#fnC').value/100;$('#fnVv').textContent=fmt(V);$('#fnAv').textContent=Math.round(a*100);$('#fnBv').textContent=Math.round(b*100);$('#fnCv2').textContent=Math.round(cc*100);
+  const S=[['방문 (유입)',V],['가입 (활성화)',V*a],['첫 구매 (수익)',V*a*b],['재구매 (유지)',V*a*b*cc]];const{c,w,h}=prep($('#fnCv'),.6);const rh=(h-16)/4,cx=w/2,W=w-30;
+  S.forEach(([n,v],i)=>{const ww=W*(.4+.6*v/V),y=8+i*rh;c.fillStyle=['#2f6fd0','#3f7fe0','#6fdc9a','#ffd166'][i];c.globalAlpha=.85;rr(c,cx-ww/2,y,ww,rh-8,8);c.fill();c.globalAlpha=1;T(c,`${n}  ${fmt(v)}명`,cx,y+(rh-8)/2,'#10141b',11.5,'center','middle','800');if(i)T(c,`× ${Math.round([a,b,cc][i-1]*100)}%`,w-8,y-4,MU,10,'right');});
+  const fin=V*a*b*cc,imp=[[a,'가입'],[b,'첫 구매'],[cc,'재구매']].map(([r,n],i)=>{const rs=[a,b,cc];rs[i]=Math.min(1,r+.1);return[n,V*rs[0]*rs[1]*rs[2]];});const best=imp.reduce((x,y)=>y[1]>x[1]?y:x);
+  $('#fnOut').innerHTML=`${fmt(V)} × ${a.toFixed(2)} × ${b.toFixed(2)} × ${cc.toFixed(2)} = <span class="w">${fmt(fin)}명</span> (처음의 ${f2(fin/V*100,1)}%)\n한 단계만 +10%p 개선하면:\n${imp.map(([n,v])=>`  ${n.padEnd(4,' ')} → ${fmt(v)}명${n===best[0]?'  <span class="o">◀ 가장 큰 변화</span>':''}`).join('\n')}\n<span class="p">비율이 가장 낮은(가장 많이 새는) 단계를 고칠수록 전체가 크게 바뀜</span>`;}
+['#fnV','#fnA','#fnB','#fnC'].forEach(id=>$(id).oninput=fnDraw);
+quiz('q2','a',ok=>`<div class="res ${ok?'g':'r'}">${ok?'정답!':'아쉬워요.'} 정답은 <b>500명</b>. 10,000 × 0.4 = <b>4,000</b>, × 0.25 = <b>1,000</b>, × 0.5 = <b>500</b> — 처음의 5%. 2,500명은 25%를 처음 인원에 바로 곱한 값, 1,000명은 재구매 단계를 빼먹은 값. 단계마다 <b>남은 사람에게</b> 다시 곱합니다.</div>`);
+const CH=[['1월',[100,40,32,27]],['2월',[100,35,26,null]],['3월',[100,28,null,null]]];let chM='heat';
+function chDraw(){const{c,w,h}=prep($('#chCv'),.55);const L=44,Tp=26,cw=(w-L-10)/4,chh=(h-Tp-30)/3;
+  if(chM==='heat'){[0,1,2,3].forEach(j=>T(c,j+'개월',L+(j+.5)*cw,Tp-10,MU,10));CH.forEach(([m,row],i)=>{T(c,m+' 가입',L-6,Tp+(i+.5)*chh,MU,10,'right');row.forEach((v,j)=>{const x=L+j*cw,y=Tp+i*chh;if(v==null){c.fillStyle='#141922';c.fillRect(x+2,y+2,cw-4,chh-4);return;}const t=v/100;c.fillStyle=`rgba(47,111,208,${.15+.85*t})`;c.fillRect(x+2,y+2,cw-4,chh-4);if(j===1){c.strokeStyle=GO;c.lineWidth=2;c.strokeRect(x+2,y+2,cw-4,chh-4);}T(c,v+'%',x+cw/2,y+chh/2,t>.5?'#fff':FG,13,'center','middle','800');});});
+    $('#chMsg').innerHTML='<div class="res r">노란 테두리 열(1개월 뒤)을 위에서 아래로: 1월 <b>40%</b> → 2월 <b>35%</b> → 3월 <b>28%</b>. <b>최근 들어온 고객일수록 빨리 떠난다</b>는 신호. 행은 가입한 달, 열은 경과한 달 — 같은 출발점끼리 비교합니다.</div>';}
+  else{const av=[0,1,2,3].map(j=>{const v=CH.map(r=>r[1][j]).filter(x=>x!=null);return v.reduce((a,b)=>a+b,0)/v.length;});const B=h-26,Y=v=>B-(B-Tp)*v/100;av.forEach((v,j)=>{const x=L+j*cw;c.fillStyle='#2f6fd0';rr(c,x+cw*.2,Y(v),cw*.6,B-Y(v),5);c.fill();T(c,f2(v,1)+'%',x+cw/2,Y(v)-9,FG,11,'center','middle','700');T(c,j+'개월',x+cw/2,B+12,MU,10);});T(c,'전체 평균 잔존율',L,12,MU,10,'left');
+    $('#chMsg').innerHTML='<div class="res y">모두 섞어 평균을 내면 1개월 잔존율 <b>34.3%</b> 하나만 보입니다. 오래된 고객과 새 고객이 섞여 <b>"점점 빨리 떠난다"는 변화가 가려집니다</b>.</div>';}}
+single('[data-ch]','ch',v=>{chM=v;chDraw();});
+
+/* ===== ④ ===== */
+const DB={exec:`<div class="dash"><div class="kpi"><div>재구매율<b>22.4%</b></div><div>목표 25%<b style="color:#ffd166">90%</b></div><div>분기 매출<b>3.1억</b></div></div><div style="margin-top:8px;height:10px;background:#1a2230;border-radius:5px"><div style="width:90%;height:10px;background:#6fdc9a;border-radius:5px"></div></div></div><div class="res g">경영진용 <b>전략형</b>: 핵심 지표와 <b>목표 달성률</b>을 크게, 몇 개만. 한눈에 "잘 가고 있나?" (숫자는 가상)</div>`,
+  ana:`<div class="dash"><div class="row"><span class="pill on" style="font-size:.74rem">기간: 1~3월 ▾</span><span class="pill" style="font-size:.74rem">지역: 전체 ▾</span><span class="pill" style="font-size:.74rem">무리: 9 ▾</span></div><table class="df" style="margin-top:8px"><tr><th>무리</th><th>쿠폰</th><th>없음</th><th>p</th></tr><tr><td>9 ▸</td><td>32,146</td><td>28,637</td><td>0.0136</td></tr></table></div><div class="res y">분석가용 <b>분석형</b>: 필터와 <b>드릴다운</b>으로 깊이 파고들기. 단, 이리저리 쪼갤수록 우연한 "당첨"도 늘어난다는 것을 기억 — 쪼갠 횟수도 함께 기록하세요.</div>`,
+  ops:`<div class="dash"><div class="kpi"><div>지금 주문/분<b>42</b></div><div>결제 실패율<b style="color:#ff7d7d">3.8%</b></div><div>재고 경고<b style="color:#ffd166">2건</b></div></div><div class="res r" style="margin-top:8px">⚠️ 결제 실패율 기준(2%) 초과 — 14:05부터</div></div><div class="res g">실무자용 <b>운영형</b>: 지금 상태와 <b>경고</b>를 실시간으로. (숫자는 가상)</div>`};
+single('[data-db]','db',v=>{$('#dbBox').innerHTML=DB[v];});
+const INS=INC.slice().sort((a,b)=>a-b);const qtl=q=>{const p=(INS.length-1)*q,i=Math.floor(p);return INS[i]+(INS[Math.min(i+1,INS.length-1)]-INS[i])*(p-i);};const Q1=qtl(.25),Q3=qtl(.75),IQ=Q3-Q1;
+function iqDraw(){const k=+$('#iqK').value;$('#iqKv').textContent=k.toFixed(1);const lo=Q1-k*IQ,hi=Q3+k*IQ,out=INC.filter(v=>v<lo||v>hi).length;$('#iqA').textContent=k.toFixed(1);$('#iqB').textContent=out+'개';$('#iqC').textContent=f2(hi/1e4,1)+'만';
+  const{c,w,h}=prep($('#iqCv'),.5);const L=10,R=w-10,B=h-20,Tp=10,mx=165000,NB=55,bw=(R-L)/NB,H=Array(NB).fill(0),HO=Array(NB).fill(0);INC.forEach(v=>{const b=Math.min(NB-1,Math.floor(v/mx*NB));(v<lo||v>hi?HO:H)[b]++;});const m=Math.max(...H.map((x,i)=>x+HO[i]));
+  for(let i=0;i<NB;i++){const h1=(B-Tp)*H[i]/m,h2=(B-Tp)*HO[i]/m;c.fillStyle='#2f6fd0';c.fillRect(L+i*bw,B-h1,bw-1,h1);c.fillStyle=BAD;c.fillRect(L+i*bw,B-h1-h2,bw-1,h2);}
+  const X=v=>L+(R-L)*v/mx;c.strokeStyle=GO;c.lineWidth=2;c.setLineDash([4,3]);c.beginPath();c.moveTo(X(hi),Tp);c.lineTo(X(hi),B);c.stroke();c.setLineDash([]);T(c,`경계 ${fmt(hi)}`,Math.min(X(hi)+4,R-60),Tp+8,GO,10,'left','middle','700');[0,50000,100000,150000].forEach(v=>T(c,(v/1e4)+'만',X(v),B+11,'#5a6b85',9));
+  $('#iqOut').innerHTML=`Q1 = ${fmt(Q1)}, Q3 = ${fmt(Q3)}, IQR = ${fmt(IQ)}\n경계 = Q3 + ${k.toFixed(1)} × IQR = <span class="w">${fmt(hi)}</span>  (아래 경계 ${fmt(lo)}은 음수라 해당 없음)\n이상치 <span class="e">${out}개</span>${k===1.5?'  <span class="p"># 원고: 38개</span>':k===2?'  <span class="p"># 원고: 24개</span>':k===3?'  <span class="p"># 원고: 10개</span>':''}\n<span class="p">대시보드에는 지금 기준과 그때 빠진 개수를 함께 — 결론이 기준에 따라 흔들리는지 보는 사람이 직접 확인</span>`;}
+$('#iqK').oninput=iqDraw;
+
+/* 나의 예 */
+const MK='lucklab.mine';let mine=[];try{mine=JSON.parse(localStorage.getItem(MK)||'[]');if(!Array.isArray(mine))mine=[];}catch(e){mine=[];}
+const saveM=()=>{try{localStorage.setItem(MK,JSON.stringify(mine));}catch(e){}};
+function drawMine(){$('#mine').innerHTML=mine.length?mine.map((m,i)=>`<div><span>🎰 ${esc(m)}</span><button data-d="${i}" aria-label="지우기">✕</button></div>`).join(''):'<p class="note">많이 찾을수록 우연도 많이 만납니다.</p>';
+  $$('#mine button').forEach(b=>b.onclick=()=>{mine.splice(+b.dataset.d,1);saveM();drawMine();});}
+$('#myAdd').onclick=()=>{const v=$('#myIn').value.trim();if(!v)return;mine.unshift(v);mine=mine.slice(0,30);saveM();$('#myIn').value='';drawMine();toast('기록했습니다!');};
+$('#myIn').addEventListener('keydown',e=>{if(e.key==='Enter')$('#myAdd').click();});
+
+function redraw(){if(!$('#tab-t1').hidden){hkDraw();smDraw();mtDraw();}if(!$('#tab-t2').hidden){pvDraw();}if(!$('#tab-t3').hidden){fnDraw();chDraw();}if(!$('#tab-t4').hidden){iqDraw();}}
+function show(t){$$('.tabs button').forEach(x=>x.classList.toggle('on',x.dataset.tab===t));['t1','t2','t3','t4'].forEach(k=>$('#tab-'+k).hidden=k!==t);redraw();window.scrollTo(0,0);}
+$$('.tabs button').forEach(b=>b.onclick=()=>show(b.dataset.tab));
+let rz;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(redraw,120);});
+smTable();$('#hyBox').innerHTML=HY[0];$('#dbBox').innerHTML=DB.exec;drawMine();redraw();
+})();
+</script>
+</body>
+</html>
